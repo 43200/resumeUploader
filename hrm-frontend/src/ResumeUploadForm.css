@@ -1,0 +1,34 @@
+.resume-form-container {
+  max-width: 500px;
+  margin: auto;
+  padding: 20px;
+  font-family: 'Poppins', sans-serif;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+input, select, button {
+  width: 100%;
+  margin: 10px 0;
+  padding: 8px;
+}
+button {
+  background-color: navy;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+}
+.logo {
+  height: 60px;
+  display: block;
+  margin: auto;
+}
+.instructions-box {
+  background: #f4f6f8;
+  padding: 16px;
+  margin-top: 20px;
+  border-left: 4px solid #ff69b4; /* Example brand pink */
+  border-radius: 8px;
+}
+
