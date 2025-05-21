@@ -1,52 +1,62 @@
 const express = require('express');
-const multer = require('multer');
 const cors = require('cors');
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
-const PORT = 5000;
+const port = 5000;
 
-// Enable CORS for your frontend
-app.use(cors({
-  origin: 'http://localhost:3000', // frontend URL
-}));
+// Enable CORS for your frontend URL or all origins
+app.use(cors());
 
-// Create uploads folder if not exist
+// Create 'uploads' folder if not exists
 const uploadDir = path.join(__dirname, 'uploads');
 if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir);
 }
 
-// Multer config for file storage
+// Configure multer disk storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, uploadDir);
   },
   filename: function (req, file, cb) {
-    // Save with timestamp to avoid name conflicts
-    cb(null, Date.now() + '-' + file.originalname);
+    // Use original file name + timestamp for uniqueness
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname);
+    cb(null, file.fieldname + '-' + uniqueSuffix + ext);
   }
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({ storage });
 
-// Upload route
-app.post('/upload-resume', upload.single('resume'), (req, res) => {
-  console.log('Received form data:', req.body);
-  console.log('Received file:', req.file);
+// POST endpoint to receive form data and file upload
+app.post('/', upload.single('resume'), (req, res) => {
+  const { name, email, phone, experience, role } = req.body;
+  const resumeFile = req.file;
 
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
+  if (!resumeFile) {
+    return res.status(400).json({ message: 'Resume file missing!' });
   }
 
-  // You can process other form fields here from req.body
+  // Log form data and file info
+  console.log('--- New Resume Upload ---');
+  console.log('Name:', name);
+  console.log('Email:', email);
+  console.log('Phone:', phone);
+  console.log('Experience:', experience);
+  console.log('Role:', role);
+  console.log('File saved at:', resumeFile.path);
+  console.log('Original filename:', resumeFile.originalname);
+  console.log('Stored filename:', resumeFile.filename);
+  console.log('MIME type:', resumeFile.mimetype);
+  console.log('Size (bytes):', resumeFile.size);
 
-  res.json({ message: 'Upload successful!' });
+  // Send success response
+  res.json({ message: 'Resume uploaded and saved successfully!' });
 });
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Backend server running at http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Backend server running at http://localhost:${port}`);
 });
-
